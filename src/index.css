@@ -1,0 +1,118 @@
+﻿@import "tailwindcss";
+
+@layer base {
+  :root {
+    --bg-canvas: #0B0E14;
+    --bg-panel: #11151C;
+    --bg-panel-hover: #161B24;
+    --bg-panel-subtle: #0E1218;
+    --border-hairline: #1F242D;
+    --border-subtle: #262B36;
+    --border-active: #384152;
+    --text-primary: #E6EDF3;
+    --text-muted: #7D8590;
+    --text-dim: #484F58;
+
+    /* Strict semantic telemetry colors */
+    --status-emerald: #10B981;
+    --status-emerald-bg: rgba(16, 185, 129, 0.10);
+    --status-emerald-border: rgba(16, 185, 129, 0.25);
+
+    --status-amber: #F59E0B;
+    --status-amber-bg: rgba(245, 158, 11, 0.10);
+    --status-amber-border: rgba(245, 158, 11, 0.25);
+
+    --status-crimson: #EF4444;
+    --status-crimson-bg: rgba(239, 68, 68, 0.12);
+    --status-crimson-border: rgba(239, 68, 68, 0.30);
+
+    --accent-steel: #38BDF8;
+  }
+
+  :root[data-theme="light"] {
+    --bg-canvas: #F4F6F9;
+    --bg-panel: #FFFFFF;
+    --bg-panel-hover: #EDF1F6;
+    --bg-panel-subtle: #FAFBFD;
+    --border-hairline: #DCE1E9;
+    --border-subtle: #C7CFDA;
+    --border-active: #A6B0BF;
+    --text-primary: #14191F;
+    --text-muted: #5B6572;
+    --text-dim: #A0A9B4;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg-canvas);
+    color: var(--text-primary);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", system-ui, sans-serif;
+    user-select: none;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Monospace & Tabular Data Font Utilities */
+  .font-mono,
+  .tabular-nums,
+  code,
+  kbd,
+  samp {
+    font-family: "JetBrains Mono", "Cascadia Code", Consolas, "SF Mono", monospace !important;
+    font-variant-numeric: tabular-nums lining-nums !important;
+  }
+}
+
+/* Tabular numbers for all precision metrics */
+.num-metric {
+  font-family: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
+  font-variant-numeric: tabular-nums lining-nums;
+  letter-spacing: -0.02em;
+}
+
+/* Hairline utility classes */
+.border-hairline {
+  border-color: var(--border-hairline);
+}
+
+.surface-canvas {
+  background-color: var(--bg-canvas);
+}
+
+.surface-panel {
+  background-color: var(--bg-panel);
+  border-color: var(--border-hairline);
+}
+
+.surface-panel:hover {
+  border-color: var(--border-subtle);
+}
+
+/* 100% Transparent root and canvas for Overlay mode */
+html.overlay-active,
+html.overlay-active body,
+html.overlay-active #root {
+  background: transparent !important;
+  background-color: transparent !important;
+  overflow: hidden !important;
+  user-select: none !important;
+  pointer-events: none !important;
+}
+
+/* High-precision native scrollbars */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-canvas);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-hairline);
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-subtle);
+}
