@@ -22,7 +22,7 @@ src-tauri/src/
     game_radar.rs     Regional game-server latency radar
     gateway.rs        Gateway diagnostics
     wifi_inspector.rs Wi-Fi interface + channel analysis
-    throughput.rs     Per-target throughput sampling
+    throughput.rs     System-wide throughput from adapter counters
     network_repair.rs Windows network stack repair
     hotkeys.rs        Hotkey config persistence
     overlay_config.rs Mini-HUD config persistence

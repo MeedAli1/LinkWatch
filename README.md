@@ -12,14 +12,14 @@ LinkWatch pings your gateway and internet targets on a configurable interval, ch
 - Rolling history stored in SQLite, automatic data retention, CSV export
 - Outage and degradation alerts with optional audio chimes and a desktop notification
 - Wi-Fi link diagnostics: interface info, signal quality, nearby-network scan, channel congestion
-- Bufferbloat / QoS load testing on demand
-- Throughput sampling per target
+- Bufferbloat / QoS load testing on demand: downloads up to ~100 MB from speed.cloudflare.com over plain HTTP while pinging 1.1.1.1, runs only when you start it, and uploads nothing from your machine
+- Throughput: system-wide download/upload rates from network adapter counters
 
 **Diagnostics**
 - Traceroute with hop latency and loss visualization
-- DNS server benchmark and comparison
+- DNS server benchmark and comparison — sends UDP/53 queries to public resolvers (Cloudflare, Google, Quad9, OpenDNS, AdGuard)
 - LAN scanner for nearby hosts
-- Game server radar: pings a fixed list of regional endpoints for CS2/Steam, Valorant, Fortnite (AWS-hosted), Discord, and Battle.net, and reports the lowest-latency region
+- Game server radar: pings a fixed list of regional endpoints for CS2/Steam, Valorant, Discord, and Battle.net, plus AWS cloud regions, and reports the lowest-latency region
 - Gateway diagnostics: resolves the active default gateway's IPv4 address directly from the Windows routing table
 - 1-click network repair (DNS cache flush, DNS re-registration, DHCP lease renewal, ARP-table clear); the last three stages require an elevated run
 
@@ -44,7 +44,7 @@ LinkWatch pings your gateway and internet targets on a configurable interval, ch
 
 ![Tools and diagnostics panel](docs/images/diagnostics.png)
 
-**Game server radar & LAN scan** — pings regional game-server endpoints (CS2, Valorant, Fortnite, Discord) to find your best region, and enumerates active hosts on your subnet.
+**Game server radar & LAN scan** — pings regional endpoints for CS2/Steam, Valorant, Discord, and Battle.net (plus AWS cloud regions) to find your best region, and enumerates active hosts on your subnet.
 
 ![Game server radar and LAN scan](docs/images/game-radar.png)
 
@@ -64,7 +64,7 @@ LinkWatch pings your gateway and internet targets on a configurable interval, ch
 
 ## Download
 
-Prebuilt installers are published on the [Releases](https://github.com/MeedAli1/LinkWatch/releases) page — `LinkWatch_0.1.0_x64_en-US.msi` (Windows Installer) or `LinkWatch_0.1.0_x64-setup.exe` (NSIS setup) for v0.1.0. Unsigned builds show a Windows SmartScreen warning; choose "More info → Run anyway".
+Prebuilt installers are published on the [Releases](https://github.com/MeedAli1/LinkWatch/releases) page — `LinkWatch_<version>_x64_en-US.msi` (Windows Installer) or `LinkWatch_<version>_x64-setup.exe` (NSIS setup). Unsigned builds show a Windows SmartScreen warning; choose "More info → Run anyway".
 
 Or build from source below.
 
@@ -98,7 +98,13 @@ The release binary lands in `src-tauri/target/release/linkwatchapp.exe`.
 
 ## Configuration
 
-All app state lives in `%LOCALAPPDATA%\LinkWatch\`: a SQLite database holding probe history, outages, custom targets, and settings, plus small JSON files for global hotkey bindings and mini-HUD position/state.
+All app state lives in `%LOCALAPPDATA%\LinkWatch\`. A SQLite database holds probe history, outages, custom targets, and settings; two small JSON files hold UI state:
+
+| File | Purpose |
+| --- | --- |
+| `linkwatch.db` | SQLite database (probe history, outages, targets, settings) |
+| `hotkeys.json` | Global hotkey bindings |
+| `overlay_config.json` | Mini-HUD position and state |
 
 Default hotkeys (remappable):
 
@@ -126,7 +132,7 @@ The app has three layers: an **engine** of small Rust modules, each owning one c
 
 ## Known limitations
 
-- IPv4 only: the ICMP pinger uses `IcmpSendEcho` and no code path handles IPv6 targets.
+- IPv4 only: the ICMP pinger uses `IcmpSendEcho` and no code path handles IPv6 targets. IPv6-only hostnames and IPv6 literal targets are reported as "DNS resolve failed", since resolution accepts only IPv4 addresses.
 - Windows only: the engine links Windows system APIs and has no portable backend.
 
 ## Contributing
