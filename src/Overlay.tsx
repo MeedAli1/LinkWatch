@@ -80,15 +80,16 @@ export default function Overlay() {
         const tp = await invoke<ThroughputData>('get_adapter_throughput');
         setThroughput(tp);
 
-        // Netcode pulse alert logic:
-        // Critical: packet loss > 0% or failed ping
-        // Warning: latency spike > 90ms or jitter > 25ms
+        // Netcode pulse alert logic.
+        // Critical must track the current link state, not lifetime history:
+        // stats[].loss_percent is a whole-retention aggregate, so a single
+        // packet dropped days ago kept the HUD pinned red and masked the
+        // configured accent color indefinitely.
         const obs = snap?.latest_observations?.slice(-1)[0];
         const rtt = obs?.rtt_measured_us != null ? obs.rtt_measured_us / 1000 : 0;
-        const lossVal = snap?.stats?.[0]?.loss_percent ?? 0;
         const jitVal = snap?.diagnostic?.jitter_ms ?? 0;
 
-        if (lossVal > 0 || (obs && !obs.success)) {
+        if (obs && !obs.success) {
           setAlertState('crit');
           if (alertTimeoutRef.current) clearTimeout(alertTimeoutRef.current);
           alertTimeoutRef.current = window.setTimeout(() => setAlertState('normal'), 2500);
