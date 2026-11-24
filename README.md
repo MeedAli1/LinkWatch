@@ -1,10 +1,8 @@
 # LinkWatch
 
-Local-first network quality and diagnostics monitor for Windows.
+Local-first network quality and diagnostics monitor for Windows 10 and later.
 
-Windows 10 or later only.
-
-LinkWatch pings your gateway and the internet on a timer, charts latency and jitter over time, detects outages, and gives you one-click diagnostic tools — traceroute, DNS comparison, bufferbloat detection, LAN scan — all from one tray-resident window. No telemetry, no accounts, and your history never leaves your machine. Monitoring and diagnostics run without admin rights; the only step that needs elevation is the ARP-table clear inside network repair.
+LinkWatch pings your gateway and internet targets on a configurable interval, charts latency and jitter over time, detects outages, and provides diagnostic tools — traceroute, DNS comparison, bufferbloat testing, LAN scan — from one tray-resident window. No telemetry, no accounts: probe history never leaves your machine. Monitoring and most diagnostics run without admin rights; the DNS re-registration, DHCP renewal, and ARP-table clear stages of network repair require an elevated run.
 
 ## Features
 
@@ -21,9 +19,9 @@ LinkWatch pings your gateway and the internet on a timer, charts latency and jit
 - Traceroute with hop latency and loss visualization
 - DNS server benchmark and comparison
 - LAN scanner for nearby hosts
-- Game server radar: pings fixed regional game-server endpoints (Steam/CS2, Riot/Valorant and similar) and reports the lowest-ping region per title
+- Game server radar: pings a fixed list of regional endpoints for CS2/Steam, Valorant, Fortnite (AWS-hosted), Discord, and Battle.net, and reports the lowest-latency region
 - Gateway diagnostics: resolves the active default gateway's IPv4 address directly from the Windows routing table
-- 1-click network repair (flush DNS cache, register DNS, renew DHCP, clear ARP table)
+- 1-click network repair (DNS cache flush, DNS re-registration, DHCP lease renewal, ARP-table clear); the last three stages require an elevated run
 
 **Interface**
 - System tray presence with a live tooltip summary
@@ -60,13 +58,13 @@ LinkWatch pings your gateway and the internet on a timer, charts latency and jit
 ## Prerequisites
 
 - Windows 10 or later
-- [Rust toolchain](https://www.rust-lang.org/tools/install) with the MSVC ABI and Visual Studio Build Tools (Tauri's Windows prerequisite)
-- [Node.js](https://nodejs.org) and npm
+- [Rust toolchain](https://www.rust-lang.org/tools/install) 1.90 or newer, with the MSVC ABI and Visual Studio Build Tools (Tauri's Windows prerequisite)
+- [Node.js](https://nodejs.org) 20.19+ or 22.12+ (Vite 8's supported range) and npm
 - Microsoft Edge WebView2 Runtime (preinstalled on recent Windows 10/11 builds)
 
 ## Download
 
-Grab the latest installers from [GitHub Releases](https://github.com/MeedAli1/LinkWatch/releases) — either `LinkWatch_0.1.0_x64_en-US.msi` (Windows Installer) or `LinkWatch_0.1.0_x64-setup.exe` (NSIS setup). Unsigned builds show a Windows SmartScreen warning; choose "More info → Run anyway".
+Prebuilt installers are published on the [Releases](https://github.com/MeedAli1/LinkWatch/releases) page — `LinkWatch_0.1.0_x64_en-US.msi` (Windows Installer) or `LinkWatch_0.1.0_x64-setup.exe` (NSIS setup) for v0.1.0. Unsigned builds show a Windows SmartScreen warning; choose "More info → Run anyway".
 
 Or build from source below.
 
@@ -100,13 +98,7 @@ The release binary lands in `src-tauri/target/release/linkwatchapp.exe`.
 
 ## Configuration
 
-All app state lives in `%LOCALAPPDATA%\LinkWatch\`:
-
-| File | Purpose |
-| --- | --- |
-| `linkwatch.db` | SQLite database (probe history, outages, targets, settings) |
-| `hotkeys.json` | Global hotkey bindings |
-| `overlay_config.json` | Mini-HUD position and state |
+All app state lives in `%LOCALAPPDATA%\LinkWatch\`: a SQLite database holding probe history, outages, custom targets, and settings, plus small JSON files for global hotkey bindings and mini-HUD position/state.
 
 Default hotkeys (remappable):
 
@@ -123,24 +115,24 @@ There are no environment variables to configure for normal use.
 
 ## Architecture
 
-The app has three layers: an **engine** of one-module-per-capability Rust components (`src-tauri/src/engine/`), a **service** layer running the always-on probe loop, alert rules, and persistence (`src-tauri/src/service.rs`), and a **React frontend** that polls snapshots over Tauri IPC. Probe history, outages, custom targets, and settings are stored in a local SQLite database. Details in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+The app has three layers: an **engine** of small Rust modules, each owning one capability (`src-tauri/src/engine/`); a **service** layer that runs the probe loop, alert rules, and persistence (`src-tauri/src/service.rs`); and a **React frontend** that polls snapshots over Tauri IPC. Probe history, outages, custom targets, and settings live in a local SQLite database. Details in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ## Development notes
 
 - Windows-only: `src-tauri` links Windows system libraries (`windows-sys`) and the build script embeds the app icon as a Windows resource.
 - The mini-HUD opens as a separate webview window loading `index.html?overlay=1`.
 - `src-tauri/tests/diagnostic_tests.rs` contains integration tests that hit live network targets, so expect environment-dependent results.
-- Monitoring needs no admin rights. The one exception is the ARP-table clear in network repair, which requires an elevated run; without elevation it is reported as failed rather than as success.
+- Monitoring and most diagnostics need no admin rights. In network repair, `ipconfig /flushdns` runs unelevated, while `ipconfig /registerdns`, `ipconfig /renew`, and the ARP-table clear require an elevated run; a refused step is reported as failed rather than as success. Autostart writes only the per-user `HKCU\Software\Microsoft\Windows\CurrentVersion\Run` key, so it never needs elevation.
 
 ## Known limitations
 
 - IPv4 only: the ICMP pinger uses `IcmpSendEcho` and no code path handles IPv6 targets.
 - Windows only: the engine links Windows system APIs and has no portable backend.
 
-## License
-
-MIT — see [LICENSE](LICENSE).
-
 ## Contributing
 
 File issues in the repository tracker with the steps to reproduce and, for probe-related bugs, the relevant entry from the diagnostics panel. Fork the repository and open a pull request against `main` with a focused, single-purpose change. Before submitting, make sure `cargo fmt`, `cargo clippy`, and `cargo test` pass in `src-tauri/`, and `npm run build` passes at the repository root.
+
+## License
+
+MIT — see [LICENSE](LICENSE).

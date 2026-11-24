@@ -1,9 +1,9 @@
 [package]
 name = "linkwatchapp"
 version = "0.1.0"
-description = "LinkWatch Network Quality Diagnostic Monitor"
+description = "Local-first network quality and diagnostics monitor"
 license = "MIT"
-authors = ["LinkWatch Team"]
+rust-version = "1.90"
 edition = "2021"
 
 [lib]

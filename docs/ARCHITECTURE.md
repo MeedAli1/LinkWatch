@@ -19,6 +19,7 @@ src-tauri/src/
     dns_bench.rs      DNS server benchmarking
     bufferbloat.rs    QoS load testing
     lan_scanner.rs    Local network scan
+    game_radar.rs     Regional game-server latency radar
     gateway.rs        Gateway diagnostics
     wifi_inspector.rs Wi-Fi interface + channel analysis
     throughput.rs     Per-target throughput sampling
